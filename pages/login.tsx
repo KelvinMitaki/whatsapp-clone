@@ -76,10 +76,7 @@ const login: React.FC<Props & InjectedFormProps<FormValues>> = props => {
             Login
           </button>
           <p>
-            Don't have an account?{" "}
-            <Link href="/register">
-              <a>Register</a>
-            </Link>{" "}
+            Don't have an account? <a href="/register">Register</a>
           </p>
         </form>
       </div>
