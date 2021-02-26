@@ -95,10 +95,7 @@ const register: React.FC<InjectedFormProps<FormValues>> = props => {
             Register
           </button>
           <p>
-            Already have an account?{" "}
-            <Link href="/login">
-              <a>Login</a>
-            </Link>{" "}
+            Already have an account? <a href="/login">Login</a>
           </p>
         </form>
       </div>
