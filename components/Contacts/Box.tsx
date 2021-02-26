@@ -49,7 +49,7 @@ const Box: React.FC<Props> = props => {
               setLoading(true);
               props.logoutLoadingFunc(true);
               await axios.get("/api/logout");
-              window.location.reload();
+              window.location.replace("/login");
               setLoading(false);
               props.logoutLoadingFunc(false);
             } catch (error) {
