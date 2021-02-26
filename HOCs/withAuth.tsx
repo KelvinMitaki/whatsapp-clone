@@ -26,6 +26,7 @@ export const withAuth = (WrappedComponent: any): React.FC => {
     ) {
       ctx.res.writeHead(301, { Location: "/login" });
       ctx.res.end();
+      return;
     }
     let componentProps = {};
     if (WrappedComponent.getInitialProps) {

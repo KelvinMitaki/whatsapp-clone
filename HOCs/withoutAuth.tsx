@@ -27,6 +27,7 @@ export const withoutAuth = (WrappedComponent: NextPage): React.FC => {
       if (res.data.currentUser !== null) {
         ctx.res.writeHead(301, { Location: "/" });
         ctx.res.end();
+        return;
       }
     }
 
