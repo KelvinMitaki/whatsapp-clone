@@ -8,8 +8,12 @@ import { axios } from "../Axios";
 export const withAuth = (WrappedComponent: any): React.FC => {
   const HocComponent = (props: any): JSX.Element => {
     const { currentUser } = useSelector((state: Redux) => state.user);
-    if (typeof window !== "undefined" && currentUser && !currentUser._id) {
-      Router.push("/login");
+    if (
+      typeof window !== "undefined" &&
+      ((currentUser && !currentUser._id) || !currentUser)
+    ) {
+      // Router.push("/login");
+      window.location.replace("/login");
       return <></>;
     }
     return <WrappedComponent {...props} />;

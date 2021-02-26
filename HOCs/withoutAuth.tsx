@@ -8,7 +8,8 @@ export const withoutAuth = (WrappedComponent: NextPage): React.FC => {
   const HocComponent = (props: any): JSX.Element => {
     const { currentUser } = useSelector((state: Redux) => state.user);
     if (typeof window !== "undefined" && currentUser && currentUser._id) {
-      Router.replace("/");
+      // Router.replace("/");
+      window.location.replace("/");
       return <></>;
     }
     return <WrappedComponent {...props} />;
