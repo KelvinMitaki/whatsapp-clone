@@ -7,7 +7,6 @@ import { axios } from "../Axios";
 
 export const withAuth = (WrappedComponent: any): React.FC => {
   const HocComponent = (props: any): JSX.Element => {
-    console.log("auth client");
     const { currentUser } = useSelector((state: Redux) => state.user);
     if (
       typeof window !== "undefined" &&
@@ -20,7 +19,6 @@ export const withAuth = (WrappedComponent: any): React.FC => {
   };
 
   HocComponent.getInitialProps = async (ctx: NextPageContext) => {
-    console.log("Auth");
     if (
       typeof window === "undefined" &&
       ctx.res &&
