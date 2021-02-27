@@ -53,6 +53,7 @@ const Box: React.FC<Props> = props => {
               setLoading(false);
               props.logoutLoadingFunc(false);
             } catch (error) {
+              window.location.reload();
               setLoading(false);
               props.logoutLoadingFunc(false);
             }
