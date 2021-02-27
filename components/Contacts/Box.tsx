@@ -44,22 +44,24 @@ const Box: React.FC<Props> = props => {
         <p onClick={() => props.toggleStarredMsgs(true)}>Starred Messages</p>
 
         <p
-          onClick={async () => {
-            try {
-              setLoading(true);
-              props.logoutLoadingFunc(true);
-              await axios.get("/api/logout");
-              window.location.replace("/login");
-              setLoading(false);
-              props.logoutLoadingFunc(false);
-            } catch (error) {
-              window.location.reload();
-              setLoading(false);
-              props.logoutLoadingFunc(false);
-            }
-          }}
+        // onClick={async () => {
+        //   try {
+        //     setLoading(true);
+        //     props.logoutLoadingFunc(true);
+        //     await axios.get("/api/logout");
+        //     window.location.replace("/login");
+        //     setLoading(false);
+        //     props.logoutLoadingFunc(false);
+        //   } catch (error) {
+        //     window.location.reload();
+        //     setLoading(false);
+        //     props.logoutLoadingFunc(false);
+        //   }
+        // }}
         >
-          Logout
+          <a href="/api/logout" style={{ color: "black" }}>
+            Logout
+          </a>
         </p>
       </div>
     </div>

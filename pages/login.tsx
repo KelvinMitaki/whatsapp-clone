@@ -36,9 +36,9 @@ const login: React.FC<Props & InjectedFormProps<FormValues>> = props => {
         type: ActionTypes.fetchCurrentUser,
         payload: res.data
       });
-      Router.push("/");
       setLoading(false);
       setRequest(true);
+      Router.replace("/");
     } catch (error) {
       setError("Invalid email or password");
       setLoading(false);
@@ -108,10 +108,9 @@ const validate = (formValues: FormValues) => {
   return errors;
 };
 
-export default withoutAuth(
-  reduxForm<FormValues>({ form: "login", validate })(
-    connect(null, dispatch =>
-      bindActionCreators({ fetchCurrentUser }, dispatch)
-    )(login)
+export default reduxForm<FormValues>({ form: "login", validate })(
+  connect(null, dispatch => bindActionCreators({ fetchCurrentUser }, dispatch))(
+    // @ts-ignore
+    withoutAuth(login)
   )
 );
