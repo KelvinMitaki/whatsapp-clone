@@ -46,22 +46,21 @@ export interface FetchCurrentUserAction {
 
 MyApp.getInitialProps = async (appContext: AppContext) => {
   try {
-    console.log(appContext.ctx.req?.headers);
     const res = await axios.get("/api/currentUser", {
       headers: appContext.ctx.req?.headers
     });
     let appProps = {};
-
+    console.log(res.data.currentUser);
     if (App.getInitialProps) {
       appProps = await App.getInitialProps({
         ...appContext,
         ctx: { ...appContext.ctx, ...res.data }
       });
-      appContext.ctx.store.dispatch<FetchCurrentUserAction>({
-        type: ActionTypes.fetchCurrentUser,
-        payload: res.data.currentUser
-      });
     }
+    appContext.ctx.store.dispatch<FetchCurrentUserAction>({
+      type: ActionTypes.fetchCurrentUser,
+      payload: res.data.currentUser
+    });
     return { ...appProps, user: res.data.currentUser };
   } catch (error) {
     console.log(error.response);

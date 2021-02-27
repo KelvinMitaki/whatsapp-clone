@@ -12,6 +12,7 @@ export const withAuth = (WrappedComponent: any): React.FC => {
       typeof window !== "undefined" &&
       ((currentUser && !currentUser._id) || !currentUser)
     ) {
+      console.log("auth client");
       Router.replace("/login");
       return <></>;
     }
@@ -25,6 +26,7 @@ export const withAuth = (WrappedComponent: any): React.FC => {
       // @ts-ignore
       !ctx.currentUser
     ) {
+      console.log("auth server");
       ctx.res.writeHead(301, { Location: "/login" });
       ctx.res.end();
     }

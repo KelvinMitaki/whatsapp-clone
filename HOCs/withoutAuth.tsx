@@ -8,14 +8,16 @@ import { Redux } from "../interfaces/Redux";
 export const withoutAuth = (WrappedComponent: NextPage): React.FC => {
   const HocComponent = (props: any): JSX.Element => {
     const { currentUser } = useSelector((state: Redux) => state.user);
-    if (typeof window !== "undefined" && currentUser && currentUser._id) {
-      Router.replace("/");
-      return <></>;
-    }
+    // if (typeof window !== "undefined" && currentUser && currentUser._id) {
+    //   console.log("withoutAuth client");
+    //   Router.replace("/");
+    //   return <></>;
+    // }
     return <WrappedComponent {...props} />;
   };
 
   HocComponent.getInitialProps = async (ctx: NextPageContext) => {
+    console.log("withoutAuth server");
     if (
       typeof window === "undefined" &&
       ctx.req &&
