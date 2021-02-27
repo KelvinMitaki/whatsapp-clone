@@ -8,8 +8,10 @@ import validator from "validator";
 import { axios } from "../Axios";
 import Router from "next/router";
 import { fetchCurrentUser } from "../redux/actions";
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { bindActionCreators } from "redux";
+import { FetchCurrentUserAction } from "./_app";
+import { ActionTypes } from "../redux/actions/types";
 
 interface FormValues {
   email: string;
@@ -24,12 +26,17 @@ const login: React.FC<Props & InjectedFormProps<FormValues>> = props => {
   const [loading, setLoading] = useState<boolean>(false);
   const [request, setRequest] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const dispatch = useDispatch();
   const loginUser = async (formValues: FormValues): Promise<void> => {
     try {
       setError("");
       setLoading(true);
-      await axios.post("/api/login", formValues);
-      props.fetchCurrentUser();
+      const res = await axios.post("/api/login", formValues);
+      dispatch<FetchCurrentUserAction>({
+        type: ActionTypes.fetchCurrentUser,
+        payload: res.data
+      });
+      Router.push("/");
       setLoading(false);
       setRequest(true);
     } catch (error) {
