@@ -79,7 +79,7 @@ const RecentChats: React.FC<Props> = props => {
             <img
               className={styles.profile_img}
               src={`http://gravatar.com/avatar/${
-                msg.from._id || Math.random()
+                msg.to._id || Math.random()
               }?d=identicon`}
               alt=""
             />
