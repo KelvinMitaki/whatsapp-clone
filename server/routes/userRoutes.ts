@@ -14,6 +14,7 @@ const route = Router();
 route.get(
   "/currentUser",
   async (req: Request, res: Response): Promise<void> => {
+    console.log("reached");
     if (!req.session?.user) {
       res.send({ currentUser: null });
       return;

@@ -4,6 +4,7 @@ import { NextPageContext } from "next";
 import { useSelector } from "react-redux";
 import { Redux } from "../interfaces/Redux";
 import { axios } from "../Axios";
+import { Store } from "redux";
 
 export const withAuth = (WrappedComponent: any): React.FC => {
   const HocComponent = (props: any): JSX.Element => {
@@ -20,13 +21,11 @@ export const withAuth = (WrappedComponent: any): React.FC => {
   };
 
   HocComponent.getInitialProps = async (ctx: NextPageContext) => {
-    const res = await axios.get("/api/currentUser", {
-      headers: ctx.req?.headers
-    });
     if (
       typeof window === "undefined" &&
       ctx.res &&
-      res.data.currentUser === null
+      // @ts-ignore
+      !ctx.currentUser
     ) {
       ctx.res.writeHead(301, { Location: "/login" });
       ctx.res.end();

@@ -1,6 +1,7 @@
 import { NextPage, NextPageContext } from "next";
 import Router from "next/router";
 import { useSelector } from "react-redux";
+import { Store } from "redux";
 import { axios } from "../Axios";
 import { Redux } from "../interfaces/Redux";
 
@@ -16,21 +17,17 @@ export const withoutAuth = (WrappedComponent: NextPage): React.FC => {
   };
 
   HocComponent.getInitialProps = async (ctx: NextPageContext) => {
-    console.log(ctx.req?.headers);
-    const res = await axios.get("/api/currentUser", {
-      headers: ctx.req?.headers
-    });
     if (
       typeof window === "undefined" &&
       ctx.req &&
       ctx.req.headers.cookie &&
-      ctx.res
+      ctx.res &&
+      // @ts-ignore
+      ctx.currentUser
     ) {
-      if (res.data.currentUser !== null) {
-        ctx.res.writeHead(301, { Location: "/" });
-        ctx.res.end();
-        return;
-      }
+      ctx.res.writeHead(301, { Location: "/" });
+      ctx.res.end();
+      return;
     }
 
     let componentProps = {};
