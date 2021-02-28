@@ -14,10 +14,11 @@ export interface FetchMessages {
   payload?: Message[] | [];
 }
 
-export const fetchMessages = (contactId: string, count: number) => async (
-  dispatch: Dispatch,
-  getState: () => Redux
-) => {
+export const fetchMessages = (
+  contactId: string,
+  count: number,
+  resetMsgs?: boolean
+) => async (dispatch: Dispatch, getState: () => Redux) => {
   try {
     dispatch<FetchMessages>({ type: ActionTypes.messagesLoadingStart });
     const showContactInfo = getState().user.showContactInfo;
@@ -26,6 +27,9 @@ export const fetchMessages = (contactId: string, count: number) => async (
     }
     let skip;
     let limit;
+    if (resetMsgs) {
+      getState().message.messages = null;
+    }
     if (!getState().message.messages) {
       skip = count - 20;
       if (skip <= 0) {

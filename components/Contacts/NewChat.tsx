@@ -24,7 +24,7 @@ import {
   SetGroupMsgInfo
 } from "../../redux/actions";
 import { User } from "../../interfaces/User";
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { MdGroupAdd } from "react-icons/md";
 import { bindActionCreators } from "redux";
 
@@ -48,6 +48,7 @@ interface Props {
 }
 const NewChat: React.FC<Props> = props => {
   const [focused, setFocused] = useState<boolean>(false);
+  const dispatch = useDispatch();
   return (
     <div className={`${styles.newChat}`} ref={props.newChatRef}>
       <div
@@ -116,10 +117,11 @@ const NewChat: React.FC<Props> = props => {
                 : ""
             }`}
             key={user._id}
-            onClick={() => {
+            onClick={async () => {
               props.setNewChat(false);
               props.addCurrentContact(user);
-              props.fetchMessages(user._id);
+
+              props.fetchMessages(user._id, 0, true);
               props.setDisplay(false);
               props.setGroupChat(false);
               props.setGroupInfo(false);
