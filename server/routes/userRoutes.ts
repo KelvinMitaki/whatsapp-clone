@@ -48,7 +48,7 @@ route.post(
     if (password !== confirmPassword) {
       throw new BadRequestError("passwords do not match");
     }
-    const userExist = await User.findOne({ email });
+    const userExist = await User.findOne({ email: email.toLowerCase() });
     if (userExist) {
       throw new BadRequestError("A user with that email already exists");
     }
@@ -57,7 +57,7 @@ route.post(
     const user = User.build({
       firstName: firstName.trim(),
       lastName: lastName.trim(),
-      email: email.trim(),
+      email: email.trim().toLowerCase(),
       password: hashedPassword
     });
     await user.save();

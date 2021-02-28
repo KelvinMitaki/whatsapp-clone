@@ -48,7 +48,6 @@ interface Props {
 }
 const NewChat: React.FC<Props> = props => {
   const [focused, setFocused] = useState<boolean>(false);
-  const dispatch = useDispatch();
   return (
     <div className={`${styles.newChat}`} ref={props.newChatRef}>
       <div
@@ -109,11 +108,15 @@ const NewChat: React.FC<Props> = props => {
       </div>
       {props.contacts &&
         props.contacts?.length !== 0 &&
-        props.contacts.map(user => (
+        props.contacts.map((user, i) => (
           <div
             className={`${styles.profile} ${
               props.contacts![0]._id.toString() === user._id.toString()
                 ? styles.msg_start
+                : ""
+            } ${
+              props.contacts && props.contacts.length - 1 === i
+                ? styles.last
                 : ""
             }`}
             key={user._id}
