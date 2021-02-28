@@ -50,7 +50,6 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
       headers: appContext.ctx.req?.headers
     });
     let appProps = {};
-    console.log(res.data.currentUser);
     if (App.getInitialProps) {
       appProps = await App.getInitialProps({
         ...appContext,

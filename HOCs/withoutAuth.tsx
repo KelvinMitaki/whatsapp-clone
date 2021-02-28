@@ -17,7 +17,6 @@ export const withoutAuth = (WrappedComponent: NextPage): React.FC => {
   };
 
   HocComponent.getInitialProps = async (ctx: NextPageContext) => {
-    console.log("withoutAuth server");
     if (
       typeof window === "undefined" &&
       ctx.req &&

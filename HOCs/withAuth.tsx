@@ -8,14 +8,13 @@ import { axios } from "../Axios";
 export const withAuth = (WrappedComponent: any): React.FC => {
   const HocComponent = (props: any): JSX.Element => {
     const { currentUser } = useSelector((state: Redux) => state.user);
-    if (
-      typeof window !== "undefined" &&
-      ((currentUser && !currentUser._id) || !currentUser)
-    ) {
-      console.log("auth client");
-      Router.replace("/login");
-      return <></>;
-    }
+    // if (
+    //   typeof window !== "undefined" &&
+    //   ((currentUser && !currentUser._id) || !currentUser)
+    // ) {
+    //   Router.replace("/login");
+    //   return <></>;
+    // }
     return <WrappedComponent {...props} />;
   };
 
@@ -26,7 +25,6 @@ export const withAuth = (WrappedComponent: any): React.FC => {
       // @ts-ignore
       !ctx.currentUser
     ) {
-      console.log("auth server");
       ctx.res.writeHead(301, { Location: "/login" });
       ctx.res.end();
     }
