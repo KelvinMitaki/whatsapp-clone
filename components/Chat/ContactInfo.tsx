@@ -35,8 +35,15 @@ const ContactInfo: React.FC<Props> = props => {
         <p>Contact Info</p>
       </div>
       <div className={styles.profile_info}>
-        <ImageGroup
+        {/* <ImageGroup
           unsized
+          src={`http://gravatar.com/avatar/${
+            currentContact?._id || Math.random()
+          }?d=identicon`}
+          alt="pfp"
+          className={styles.profile_img}
+        /> */}
+        <img
           src={`http://gravatar.com/avatar/${
             currentContact?._id || Math.random()
           }?d=identicon`}
