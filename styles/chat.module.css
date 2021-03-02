@@ -88,9 +88,15 @@
 
 .contact_info_header .userInfo h1 {
   margin-bottom: 0%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 .message_start {
   margin-bottom: 10rem;
+}
+.userInfo {
+  width: 100%;
 }
 .chatHeader .userInfo {
   display: flex;
@@ -98,7 +104,6 @@
   justify-content: center;
   margin-left: 1rem;
   cursor: pointer;
-  width: fit-content;
 }
 .chatHeader .userInfo p {
   margin-top: 0.5rem;
