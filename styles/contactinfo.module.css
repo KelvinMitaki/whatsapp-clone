@@ -43,6 +43,9 @@
 .nameInfo {
   padding-left: 4rem;
 }
+.nameInfo h1 {
+  text-transform: capitalize;
+}
 .profile_img {
   height: 20rem;
   width: 20rem;

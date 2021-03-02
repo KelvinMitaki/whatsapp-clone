@@ -111,6 +111,7 @@
 .chatHeader .userInfo h1 {
   margin: 0%;
   padding: 0%;
+  text-transform: capitalize;
 }
 .chatIcons {
   display: flex;
