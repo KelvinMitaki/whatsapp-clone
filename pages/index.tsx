@@ -1,4 +1,4 @@
-import { NextPageContext } from "next";
+import { GetServerSideProps, NextPageContext } from "next";
 import React, { useEffect, useState } from "react";
 import { axios } from "../Axios";
 import Chat from "../components/Chat/Chat";
@@ -60,6 +60,7 @@ import Starred from "../components/Contacts/Starred";
 import Prompt from "../components/Modals/Prompt";
 import GrpPrompt from "../components/Group/GrpPrompt";
 import Loading from "../components/Loading";
+import { wrapper } from "../redux";
 
 export const io =
   process.env.NODE_ENV === "development"
@@ -106,15 +107,11 @@ const index = (props: Props) => {
   const currentUser = useSelector<Redux>(
     state => state.user.currentUser
   ) as Redux["user"]["currentUser"];
-  const contacts = useSelector<Redux>(
-    state => state.user.contacts
-  ) as Redux["user"]["contacts"];
+  const contacts = useSelector<Redux>(state => state.user.contacts) as Redux["user"]["contacts"];
   const showContactInfo = useSelector<Redux>(
     state => state.user.showContactInfo
   ) as Redux["user"]["showContactInfo"];
-  const groups = useSelector<Redux>(
-    state => state.group.groups
-  ) as Redux["group"]["groups"];
+  const groups = useSelector<Redux>(state => state.group.groups) as Redux["group"]["groups"];
   const currentGroup = useSelector<Redux>(
     state => state.group.currentGroup
   ) as Redux["group"]["currentGroup"];
@@ -158,11 +155,7 @@ const index = (props: Props) => {
     // LISTEN FOR A NEW GROUP
     io.on("group", (data: { action: string; group: Group }) => {
       if (data.action === "create") {
-        if (
-          data.group.participants.find(
-            pat => pat._id === currentUser?._id.toString()
-          )
-        ) {
+        if (data.group.participants.find(pat => pat._id === currentUser?._id.toString())) {
           props.addGroup(data.group, currentUser!);
         }
       }
@@ -193,14 +186,11 @@ const index = (props: Props) => {
           }
         });
       });
-      io.on(
-        "groupread",
-        (data: { action: "change"; groupMsgs: GroupMsg[] }) => {
-          if (data.action === "change") {
-            props.setGroupRead(data.groupMsgs);
-          }
+      io.on("groupread", (data: { action: "change"; groupMsgs: GroupMsg[] }) => {
+        if (data.action === "change") {
+          props.setGroupRead(data.groupMsgs);
         }
-      );
+      });
     }
 
     io.on("active", (data: { action: string; user: User }) => {
@@ -325,11 +315,7 @@ const index = (props: Props) => {
     setlogoutLoading(loading);
   };
   return (
-    <div
-      className={`${styles.container} ${
-        !loaded ? styles.not_loaded : styles.loaded
-      }`}
-    >
+    <div className={`${styles.container} ${!loaded ? styles.not_loaded : styles.loaded}`}>
       <ContactsContext.Provider value={{ contacts: props.contacts }}>
         <MessagesContext.Provider value={props.messages!}>
           <Contacts logoutLoadingFunc={logoutLoadingFunc} />
@@ -339,10 +325,7 @@ const index = (props: Props) => {
           <NewGroupContacts />
           <GroupSubject />
           {currentContact ? (
-            <Chat
-              selectMessages={selectMessages}
-              setSelectMessages={setSelectMessages}
-            />
+            <Chat selectMessages={selectMessages} setSelectMessages={setSelectMessages} />
           ) : (
             <WithoutChat />
           )}
@@ -383,8 +366,49 @@ export interface FetchAllGroups {
   left?: boolean;
 }
 
-index.getInitialProps = async (ctx: NextPageContext) => {
+// index.getInitialProps = async (ctx: NextPageContext) => {
+//   try {
+//     const lastMsgs = await axios.get<FetchLastMsg["payload"]>("/api/last/msg", {
+//       headers: ctx.req?.headers
+//     });
+//     ctx.store.dispatch<FetchLastMsg>({
+//       type: ActionTypes.fetchLastMsg,
+//       payload: lastMsgs.data
+//     });
+//     const res = await axios.get<User[]>("/api/all/contacts", {
+//       headers: ctx.req?.headers
+//     });
+//     ctx.store.dispatch({ type: ActionTypes.fetchContacts, payload: res.data });
+
+//     const grpres = await axios.get<FetchAllGroups["payload"]>(
+//       "/api/all/groups",
+//       { headers: ctx.req?.headers }
+//     );
+
+//     ctx.store.dispatch<FetchAllGroups>({
+//       type: ActionTypes.fetchAllGroups,
+//       payload: grpres.data
+//     });
+
+//     return {
+//       contacts: res.data
+//     };
+//   } catch (error) {
+//     return { statusCode: error.response.status };
+//   }
+// };
+
+export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps(async ctx => {
   try {
+    const authenticated = withAuth(ctx);
+    if (!authenticated) {
+      return {
+        redirect: {
+          destination: "/login",
+          permanent: true
+        }
+      };
+    }
     const lastMsgs = await axios.get<FetchLastMsg["payload"]>("/api/last/msg", {
       headers: ctx.req?.headers
     });
@@ -397,23 +421,25 @@ index.getInitialProps = async (ctx: NextPageContext) => {
     });
     ctx.store.dispatch({ type: ActionTypes.fetchContacts, payload: res.data });
 
-    const grpres = await axios.get<FetchAllGroups["payload"]>(
-      "/api/all/groups",
-      { headers: ctx.req?.headers }
-    );
+    const grpres = await axios.get<FetchAllGroups["payload"]>("/api/all/groups", {
+      headers: ctx.req?.headers
+    });
 
     ctx.store.dispatch<FetchAllGroups>({
       type: ActionTypes.fetchAllGroups,
       payload: grpres.data
     });
-
     return {
-      contacts: res.data
+      props: {
+        contacts: res.data
+      }
     };
   } catch (error) {
-    return { statusCode: error.response.status };
+    return {
+      props: { statusCode: error.response.status }
+    };
   }
-};
+});
 
 export default connect(null, dispatch =>
   bindActionCreators(
@@ -434,4 +460,4 @@ export default connect(null, dispatch =>
     },
     dispatch
   )
-)(withAuth(index));
+)(index);
