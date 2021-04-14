@@ -369,7 +369,6 @@ export const getServerSideProps: GetServerSideProps = async ctx => {
   try {
     const store = initializeStore();
     const authenticated = await withAuth(ctx, store);
-    console.log({ authenticated });
     if (!authenticated) {
       return {
         redirect: {
