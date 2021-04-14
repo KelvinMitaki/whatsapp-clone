@@ -9,40 +9,41 @@ import {
 } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
 import thunk, { ThunkMiddleware } from "redux-thunk";
-import { createWrapper, HYDRATE } from "next-redux-wrapper";
 import { reducer as formReducer } from "redux-form";
 import { userReducer } from "./reducers/userReducer";
 import { Redux } from "../interfaces/Redux";
-import { Reducer } from "react";
+import { Reducer, useMemo } from "react";
 import { messageReducer } from "./reducers/messageReducer";
 import { groupReducer } from "./reducers/groupReducer";
 
-const bindMiddleware = (middleware: ThunkMiddleware[]): StoreEnhancer => {
-  return composeWithDevTools(applyMiddleware(...middleware));
-};
-
-const combinedReducer = combineReducers<
-  Reducer<CombinedState<Redux>, AnyAction>
->({
+const combinedReducer = combineReducers<Reducer<CombinedState<Redux>, AnyAction>>({
   form: formReducer,
   user: userReducer,
   message: messageReducer,
   group: groupReducer
 });
 
+let store: Store | undefined;
 const reducer = (state: any, action: AnyAction) => {
-  if (action.type === HYDRATE) {
-    const nextState = {
-      ...state,
-      ...action.payload
-    };
-    if (state.form) nextState.form = state.form;
-    return nextState;
-  } else {
-    return combinedReducer(state, action);
-  }
+  return combinedReducer(state, action);
 };
 
-const initStore = (): Store => createStore(reducer, bindMiddleware([thunk]));
+const initStore = (preloadedState = {}) => {
+  return createStore(reducer, preloadedState, composeWithDevTools(applyMiddleware(thunk)));
+};
 
-export const wrapper = createWrapper(initStore);
+export const initializeStore = (preloadedState?: {}) => {
+  let _store = store ?? initStore(preloadedState);
+  if (preloadedState && store) {
+    _store = initStore({ ...store.getState(), ...preloadedState });
+    store = undefined;
+  }
+  if (typeof window === "undefined") return _store;
+  if (!store) store = _store;
+  return _store;
+};
+
+export const useStore = (initialState: {}) => {
+  const store = useMemo(() => initializeStore(initialState), [initialState]);
+  return store;
+};

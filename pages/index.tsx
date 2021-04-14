@@ -60,7 +60,7 @@ import Starred from "../components/Contacts/Starred";
 import Prompt from "../components/Modals/Prompt";
 import GrpPrompt from "../components/Group/GrpPrompt";
 import Loading from "../components/Loading";
-import { wrapper } from "../redux";
+import { initializeStore } from "../redux";
 
 export const io =
   process.env.NODE_ENV === "development"
@@ -365,42 +365,11 @@ export interface FetchAllGroups {
   payload: Group[] | [];
   left?: boolean;
 }
-
-// index.getInitialProps = async (ctx: NextPageContext) => {
-//   try {
-//     const lastMsgs = await axios.get<FetchLastMsg["payload"]>("/api/last/msg", {
-//       headers: ctx.req?.headers
-//     });
-//     ctx.store.dispatch<FetchLastMsg>({
-//       type: ActionTypes.fetchLastMsg,
-//       payload: lastMsgs.data
-//     });
-//     const res = await axios.get<User[]>("/api/all/contacts", {
-//       headers: ctx.req?.headers
-//     });
-//     ctx.store.dispatch({ type: ActionTypes.fetchContacts, payload: res.data });
-
-//     const grpres = await axios.get<FetchAllGroups["payload"]>(
-//       "/api/all/groups",
-//       { headers: ctx.req?.headers }
-//     );
-
-//     ctx.store.dispatch<FetchAllGroups>({
-//       type: ActionTypes.fetchAllGroups,
-//       payload: grpres.data
-//     });
-
-//     return {
-//       contacts: res.data
-//     };
-//   } catch (error) {
-//     return { statusCode: error.response.status };
-//   }
-// };
-
-export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps(async ctx => {
+export const getServerSideProps: GetServerSideProps = async ctx => {
   try {
-    const authenticated = withAuth(ctx);
+    const store = initializeStore();
+    const authenticated = await withAuth(ctx, store);
+    console.log({ authenticated });
     if (!authenticated) {
       return {
         redirect: {
@@ -412,34 +381,41 @@ export const getServerSideProps: GetServerSideProps = wrapper.getServerSideProps
     const lastMsgs = await axios.get<FetchLastMsg["payload"]>("/api/last/msg", {
       headers: ctx.req?.headers
     });
-    ctx.store.dispatch<FetchLastMsg>({
+    store.dispatch<FetchLastMsg>({
       type: ActionTypes.fetchLastMsg,
       payload: lastMsgs.data
     });
     const res = await axios.get<User[]>("/api/all/contacts", {
       headers: ctx.req?.headers
     });
-    ctx.store.dispatch({ type: ActionTypes.fetchContacts, payload: res.data });
+    store.dispatch({ type: ActionTypes.fetchContacts, payload: res.data });
 
     const grpres = await axios.get<FetchAllGroups["payload"]>("/api/all/groups", {
       headers: ctx.req?.headers
     });
-
-    ctx.store.dispatch<FetchAllGroups>({
+    store.dispatch<FetchAllGroups>({
       type: ActionTypes.fetchAllGroups,
       payload: grpres.data
     });
     return {
       props: {
-        contacts: res.data
+        contacts: res.data,
+        initialReduxState: store.getState()
       }
     };
   } catch (error) {
-    return {
-      props: { statusCode: error.response.status }
-    };
+    console.log(error);
+    if (error.response && error.response.status) {
+      return {
+        redirect: {
+          destination: "/login",
+          permanent: true
+        }
+      };
+    }
+    return { props: {} };
   }
-});
+};
 
 export default connect(null, dispatch =>
   bindActionCreators(

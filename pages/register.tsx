@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { withoutAuth } from "../HOCs/withoutAuth";
-import Link from "next/link";
 import { Field, InjectedFormProps, reduxForm } from "redux-form";
 import Input from "../components/Input";
 import validator from "validator";
 import { axios } from "../Axios";
 import Router from "next/router";
+import { withAuth } from "../HOCs/withAuth";
+import { GetServerSideProps } from "next";
+import { initializeStore } from "../redux";
 
 interface FormValues {
   firstName: string;
@@ -66,13 +67,7 @@ const register: React.FC<InjectedFormProps<FormValues>> = props => {
             label="Last Name"
             name="lastName"
           />
-          <Field
-            type="text"
-            component={Input}
-            placeholder="Email"
-            label="Email"
-            name="email"
-          />
+          <Field type="text" component={Input} placeholder="Email" label="Email" name="email" />
           <Field
             type="password"
             component={Input}
@@ -88,10 +83,7 @@ const register: React.FC<InjectedFormProps<FormValues>> = props => {
             name="confirmPassword"
           />
 
-          <button
-            className="btn"
-            disabled={props.invalid || request || loading}
-          >
+          <button className="btn" disabled={props.invalid || request || loading}>
             Register
           </button>
           <p>
@@ -105,34 +97,21 @@ const register: React.FC<InjectedFormProps<FormValues>> = props => {
 
 const validate = (formValues: FormValues) => {
   const errors = {} as FormValues;
-  if (
-    !formValues.firstName ||
-    (formValues.firstName && !formValues.firstName.trim())
-  ) {
+  if (!formValues.firstName || (formValues.firstName && !formValues.firstName.trim())) {
     errors.firstName = "Please enter a first name";
   }
-  if (
-    !formValues.lastName ||
-    (formValues.lastName && !formValues.lastName.trim())
-  ) {
+  if (!formValues.lastName || (formValues.lastName && !formValues.lastName.trim())) {
     errors.lastName = "Please enter a last name";
   }
-  if (
-    !formValues.email ||
-    (formValues.email && !validator.isEmail(formValues.email))
-  ) {
+  if (!formValues.email || (formValues.email && !validator.isEmail(formValues.email))) {
     errors.email = "Please enter a valid email";
   }
-  if (
-    !formValues.password ||
-    (formValues.password && formValues.password.trim().length < 6)
-  ) {
+  if (!formValues.password || (formValues.password && formValues.password.trim().length < 6)) {
     errors.password = "Password must be six characters min";
   }
   if (
     !formValues.confirmPassword ||
-    (formValues.confirmPassword &&
-      formValues.confirmPassword !== formValues.password)
+    (formValues.confirmPassword && formValues.confirmPassword !== formValues.password)
   ) {
     errors.confirmPassword = "Passwords do not match";
   }
@@ -140,6 +119,27 @@ const validate = (formValues: FormValues) => {
   return errors;
 };
 
-export default withoutAuth(
-  reduxForm<FormValues>({ form: "register", validate })(register)
-);
+export const getServerSideProps: GetServerSideProps = async ctx => {
+  try {
+    const store = initializeStore();
+    const authenticated = await withAuth(ctx, store);
+    if (authenticated) {
+      return {
+        redirect: {
+          destination: "/",
+          permanent: true
+        }
+      };
+    }
+    return {
+      props: {
+        initialReduxState: store.getState()
+      }
+    };
+  } catch (error) {
+    return { props: {} };
+    console.log(error);
+  }
+};
+
+export default reduxForm<FormValues>({ form: "register", validate })(register);
