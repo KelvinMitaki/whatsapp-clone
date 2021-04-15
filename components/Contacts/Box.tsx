@@ -33,10 +33,7 @@ const Box: React.FC<Props> = props => {
         loading ? styles.loading : ""
       }`}
     >
-      <div
-        ref={props.menuRef}
-        className={`${styles.box} ${props.hideMenu && styles.hideMenu}`}
-      >
+      <div ref={props.menuRef} className={`${styles.box} ${props.hideMenu && styles.hideMenu}`}>
         <p onClick={() => props.setNewGroup(true)}>New Group</p>
 
         <p onClick={() => props.toggleProfile(true)}>Profile</p>
@@ -44,24 +41,22 @@ const Box: React.FC<Props> = props => {
         <p onClick={() => props.toggleStarredMsgs(true)}>Starred Messages</p>
 
         <p
-        // onClick={async () => {
-        //   try {
-        //     setLoading(true);
-        //     props.logoutLoadingFunc(true);
-        //     await axios.get("/api/logout");
-        //     window.location.replace("/login");
-        //     setLoading(false);
-        //     props.logoutLoadingFunc(false);
-        //   } catch (error) {
-        //     window.location.reload();
-        //     setLoading(false);
-        //     props.logoutLoadingFunc(false);
-        //   }
-        // }}
+          onClick={async () => {
+            try {
+              setLoading(true);
+              props.logoutLoadingFunc(true);
+              await axios.get("/api/logout");
+              window.location.replace("/login");
+              setLoading(false);
+              props.logoutLoadingFunc(false);
+            } catch (error) {
+              window.location.reload();
+              setLoading(false);
+              props.logoutLoadingFunc(false);
+            }
+          }}
         >
-          <a href="/api/logout" style={{ color: "black" }}>
-            Logout
-          </a>
+          Logout
         </p>
       </div>
     </div>
@@ -69,8 +64,5 @@ const Box: React.FC<Props> = props => {
 };
 
 export default connect(null, dispatch =>
-  bindActionCreators(
-    { toggleProfile, setNewGroup, toggleStarredMsgs },
-    dispatch
-  )
+  bindActionCreators({ toggleProfile, setNewGroup, toggleStarredMsgs }, dispatch)
 )(Box);
